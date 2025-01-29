@@ -1,4 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Permission to make HTTP request -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Permission to open device storage -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application
         android:label="wktechnology"
         android:name="${applicationName}"
