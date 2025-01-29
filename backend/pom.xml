@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com</groupId>
-	<artifactId>wktechnology</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>wk-backend</artifactId>
+	<version>v1.0.0</version>
 	<name>wktechnology</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Spring Boot Application</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -30,6 +30,16 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.30</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -55,7 +65,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -64,5 +73,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
