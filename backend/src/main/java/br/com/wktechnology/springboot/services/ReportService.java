@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ReportService {
@@ -103,6 +104,25 @@ public class ReportService {
             double averageBmi = bmis.isEmpty() ? 0.0 : sum / bmis.size();
 
             result.add(new AverageBMIByAgeRangeDTO(ageRange, averageBmi));
+        }
+
+        return result;
+    }
+
+    public List<NumberOfDonorsByBloodType> getNumberOfDonorsByBloodType(){
+        List<DonorsByBloodTypeDTO> donorsByBloodType = candidateRepository.getValidDonorsByBloodType();
+        List<NumberOfDonorsByBloodType> result = new ArrayList<>();
+
+        for (BloodType receiverBloodType : BloodType.values()) {
+            long totalDonors = 0;
+
+            for (DonorsByBloodTypeDTO donor : donorsByBloodType) {
+                if (receiverBloodType.canReceiveFrom(donor.getBloodType())) {
+                    totalDonors += donor.getQuantityOfDonors();
+                }
+            }
+
+            result.add(new NumberOfDonorsByBloodType(receiverBloodType, totalDonors));
         }
 
         return result;

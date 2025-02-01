@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-public class HelloController {
+public class ReportController {
 
     @Autowired
     private final ObjectMapper objectMapper;
@@ -32,17 +32,11 @@ public class HelloController {
     @Autowired
     private final CandidateService candidateService;
 
-    public HelloController(ObjectMapper objectMapper, CandidateRepository repository, ReportService service, CandidateService candidateService) {
+    public ReportController(ObjectMapper objectMapper, CandidateRepository repository, ReportService service, CandidateService candidateService) {
         this.objectMapper = objectMapper;
         this.repository = repository;
         this.service = service;
         this.candidateService = candidateService;
-    }
-
-    @GetMapping(value = "/report")
-    public ResponseEntity<String> getReport(){
-//        service.getAllPeopleBMIAndTheRanges();
-        return ResponseEntity.ok( "executed");
     }
 
     @GetMapping(value = "/candidates-of-each-state")
@@ -51,8 +45,14 @@ public class HelloController {
         return ResponseEntity.ok( result);
     }
 
-    @GetMapping(value = "/obesity-rate")
-    public ResponseEntity<ObesityRateDTO> getObesityRate(){
+    @GetMapping(value = "/average-bmi-by-age-range")
+    public ResponseEntity<List<AverageBMIByAgeRangeDTO>> getAverageBMIByAgeRange(){
+        List<AverageBMIByAgeRangeDTO> result = service.getAverageBMIByAgeRange();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(value = "/obesity-rate-by-gender")
+    public ResponseEntity<ObesityRateDTO> getObesityRateByGender(){
         ObesityRateDTO result = service.getObesityRate();
         return ResponseEntity.ok(result);
     }
@@ -63,14 +63,17 @@ public class HelloController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping(value = "/average-bmi-by-age-range")
-    public ResponseEntity<List<AverageBMIByAgeRangeDTO>> getAverageBMIByAgeRange(){
-        List<AverageBMIByAgeRangeDTO> result = service.getAverageBMIByAgeRange();
+
+
+    @GetMapping(value = "/number-of-donors-by-blood-type")
+    public ResponseEntity<List<NumberOfDonorsByBloodType>> getNumberOfDonorsByBloodType(){
+        List<NumberOfDonorsByBloodType> result = service.getNumberOfDonorsByBloodType();
         return ResponseEntity.ok(result);
     }
 
 
-    @PostMapping(value = "/uploadJson", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
+    @PostMapping(value = "/upload-json", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<JsonUploadResponse> uploadFile(@RequestParam("file") MultipartFile jsonFile) {
         try {
 
@@ -86,8 +89,8 @@ public class HelloController {
                     peopleJson.add(person);
                 }
             }
-            List<Candidate> people = candidateService.parseJsonListToCandidateList(peopleJson);
-            savePeopleBatch(people); //Warning: Batch insert
+            List<Candidate> candidates = candidateService.parseJsonListToCandidateList(peopleJson);
+            candidateService.saveInBatch(candidates); //Warning: Batch insert
 
             String fileName = jsonFile.getOriginalFilename();
             long fileSize = jsonFile.getSize();
@@ -109,10 +112,5 @@ public class HelloController {
                             "Error processing file: " + e.getMessage()
                     ));
         }
-    }
-
-    @Transactional
-    public void savePeopleBatch(List<Candidate> people) {
-        repository.saveAll(people); // Bulk save to database
     }
 }

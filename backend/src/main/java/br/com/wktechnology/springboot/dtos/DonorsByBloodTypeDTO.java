@@ -6,13 +6,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CandidateBloodTypeAndAgeDTO {
+public class DonorsByBloodTypeDTO {
+    private final Long quantityOfDonors;
     private final BloodType bloodType;
-    private final Integer age;
 
-    public CandidateBloodTypeAndAgeDTO(BloodType bloodType, Integer age) {
+    public DonorsByBloodTypeDTO(BloodType bloodType, Long quantityOfDonors) {
         this.bloodType = bloodType;
-        this.age = age;
+        this.quantityOfDonors = quantityOfDonors;
     }
 }
-

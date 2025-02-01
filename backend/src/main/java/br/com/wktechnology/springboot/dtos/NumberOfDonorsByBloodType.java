@@ -1,18 +1,19 @@
 package br.com.wktechnology.springboot.dtos;
 
 import br.com.wktechnology.springboot.entities.BloodType;
-import br.com.wktechnology.springboot.utils.FormatterHelper;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
-public class AverageAgeByBloodTypeDTO {
+@Setter
+public class NumberOfDonorsByBloodType {
     private final BloodType bloodType;
     private final String bloodTypeLabel;
-    private final String averageAge;
+    private final Long numberOfDonors;
 
-    public AverageAgeByBloodTypeDTO(BloodType bloodType, Double averageAge) {
+    public NumberOfDonorsByBloodType(BloodType bloodType, Long numberOfDonors) {
         this.bloodType = bloodType;
         this.bloodTypeLabel = bloodType.toString();
-        this.averageAge = FormatterHelper.formatAverage(averageAge);
+        this.numberOfDonors = numberOfDonors;
     }
 }

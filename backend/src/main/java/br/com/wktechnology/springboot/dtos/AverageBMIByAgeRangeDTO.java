@@ -1,7 +1,6 @@
 package br.com.wktechnology.springboot.dtos;
 
 import br.com.wktechnology.springboot.entities.AgeRange;
-import br.com.wktechnology.springboot.entities.BloodType;
 import br.com.wktechnology.springboot.utils.FormatterHelper;
 import lombok.Getter;
 
