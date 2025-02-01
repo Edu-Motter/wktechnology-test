@@ -3,17 +3,16 @@ package br.com.wktechnology.springboot.dtos;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Getter
 @Setter
-public class CandidateBMIDTO {
+public class CandidateDTO {
     private Double bmi;
+    private Integer age;
     private String gender;
 
-    public CandidateBMIDTO(Double bmi, String gender) {
+    public CandidateDTO(Double bmi, String gender, Integer age) {
         this.bmi =bmi;
+        this.age =age;
         this.gender = gender;
-
     }
 }

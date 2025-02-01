@@ -25,7 +25,7 @@ public class WktechnologyApplication {
         return args -> {
             System.out.println("Spring a boot running in http://localhost:8080");
             List<Candidate> candidateList = repository.findAll();
-            System.out.println("List of people:" + candidateList.toString());
+            System.out.println("List of people:" + candidateList);
             candidateList.forEach(p -> System.out.println(p.getName() + " - " + p.getGender()));
 
             Candidate candidate = new Candidate();

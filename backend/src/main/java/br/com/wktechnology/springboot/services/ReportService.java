@@ -1,14 +1,15 @@
 package br.com.wktechnology.springboot.services;
 
-import br.com.wktechnology.springboot.dtos.CandidateBMIDTO;
-import br.com.wktechnology.springboot.dtos.CandidatesOfStateDTO;
-import br.com.wktechnology.springboot.dtos.ObesityRateDTO;
+import br.com.wktechnology.springboot.dtos.*;
+import br.com.wktechnology.springboot.entities.AgeRange;
+import br.com.wktechnology.springboot.entities.BloodType;
 import br.com.wktechnology.springboot.repositories.CandidateRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ReportService {
@@ -24,14 +25,14 @@ public class ReportService {
     }
 
     public ObesityRateDTO getObesityRate(){
-        List<CandidateBMIDTO> bmis = candidateRepository.getCandidateBMI();
+        List<CandidateDTO> bmis = candidateRepository.getCandidates();
 
-        ArrayList<CandidateBMIDTO> men = new ArrayList<>();
-        ArrayList<CandidateBMIDTO> obesityMen = new ArrayList<>();
-        ArrayList<CandidateBMIDTO> women = new ArrayList<>();
-        ArrayList<CandidateBMIDTO> obesityWomen = new ArrayList<>();
+        ArrayList<CandidateDTO> men = new ArrayList<>();
+        ArrayList<CandidateDTO> obesityMen = new ArrayList<>();
+        ArrayList<CandidateDTO> women = new ArrayList<>();
+        ArrayList<CandidateDTO> obesityWomen = new ArrayList<>();
 
-        for (CandidateBMIDTO bmi : bmis){
+        for (CandidateDTO bmi : bmis){
             if (bmi.getGender().toUpperCase().startsWith("F")){
                 women.add(bmi);
 ///             Considerado obeso quem tem IMC > 30
@@ -55,12 +56,64 @@ public class ReportService {
         return new ObesityRateDTO(maleObesityRate, femaleObesityRate);
     }
 
+    public List<AverageAgeByBloodTypeDTO> getAverageAgesByBloodType(){
+        List<CandidateBloodTypeAndAgeDTO> dtos = candidateRepository.getCandidatesBloodTypeAndAge();
+
+        Map<BloodType, List<Integer>> bloodTypeMap = new HashMap<>();
+        for (CandidateBloodTypeAndAgeDTO candidate : dtos) {
+            bloodTypeMap
+                    .computeIfAbsent(candidate.getBloodType(), type -> new ArrayList<>())
+                    .add(candidate.getAge());
+        }
+
+        List<AverageAgeByBloodTypeDTO> result = new ArrayList<>();
+        for (Map.Entry<BloodType, List<Integer>> entry : bloodTypeMap.entrySet()) {
+            BloodType bloodType = entry.getKey();
+            List<Integer> ages = entry.getValue();
+            int sum = 0;
+            for (Integer age : ages) {
+                sum += age;
+            }
+            double averageAge = ages.isEmpty() ? 0.0 : (double) sum / ages.size();
+            result.add(new AverageAgeByBloodTypeDTO(bloodType, averageAge));
+        }
+        return result;
+    }
+
+    public List<AverageBMIByAgeRangeDTO> getAverageBMIByAgeRange(){
+        List<CandidateDTO> candidates = candidateRepository.getCandidates();
+
+        Map<AgeRange, List<Double>> ageRangeMap = new HashMap<>();
+        for (CandidateDTO candidate : candidates) {
+            final AgeRange ageRange = AgeRange.getAgeRangeOf(candidate.getAge());
+            ageRangeMap
+                    .computeIfAbsent(ageRange, range -> new ArrayList<>())
+                    .add(candidate.getBmi());
+        }
+
+        List<AverageBMIByAgeRangeDTO> result = new ArrayList<>();
+        for (Map.Entry<AgeRange, List<Double>> entry : ageRangeMap.entrySet()) {
+            AgeRange ageRange = entry.getKey();
+            List<Double> bmis = entry.getValue();
+
+            double sum = 0.0;
+            for (Double bmi : bmis) {
+                sum += bmi;
+            }
+            double averageBmi = bmis.isEmpty() ? 0.0 : sum / bmis.size();
+
+            result.add(new AverageBMIByAgeRangeDTO(ageRange, averageBmi));
+        }
+
+        return result;
+    }
+
 //   public HashMap<Integer, List<Double>> getAllPeopleBMIAndTheRanges() {
-//        List<CandidateBMIDTO> data = candidateRepository.findBMIData();
+//        List<CandidateDTO> data = candidateRepository.findBMIData();
 //
 //        HashMap<Integer, List<Double>> report = new HashMap<>();
 //
-//        for (CandidateBMIDTO person : data) {
+//        for (CandidateDTO person : data) {
 //            Integer years = person.getYearsOfLife();
 //            double bmi = person.calculateBMI();
 //

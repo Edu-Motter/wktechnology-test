@@ -1,9 +1,7 @@
 package br.com.wktechnology.springboot.controllers;
 
 import br.com.wktechnology.springboot.controllers.responses.JsonUploadResponse;
-import br.com.wktechnology.springboot.dtos.CandidateJson;
-import br.com.wktechnology.springboot.dtos.CandidatesOfStateDTO;
-import br.com.wktechnology.springboot.dtos.ObesityRateDTO;
+import br.com.wktechnology.springboot.dtos.*;
 import br.com.wktechnology.springboot.entities.Candidate;
 import br.com.wktechnology.springboot.repositories.CandidateRepository;
 import br.com.wktechnology.springboot.services.CandidateService;
@@ -56,6 +54,18 @@ public class HelloController {
     @GetMapping(value = "/obesity-rate")
     public ResponseEntity<ObesityRateDTO> getObesityRate(){
         ObesityRateDTO result = service.getObesityRate();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(value = "/average-age-by-blood-type")
+    public ResponseEntity<List<AverageAgeByBloodTypeDTO>> getAverageAgeByBloodType(){
+        List<AverageAgeByBloodTypeDTO> result = service.getAverageAgesByBloodType();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(value = "/average-bmi-by-age-range")
+    public ResponseEntity<List<AverageBMIByAgeRangeDTO>> getAverageBMIByAgeRange(){
+        List<AverageBMIByAgeRangeDTO> result = service.getAverageBMIByAgeRange();
         return ResponseEntity.ok(result);
     }
 
