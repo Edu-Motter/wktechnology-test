@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PersonJson {
+public class CandidateJson {
     @JsonProperty("nome")
     private String nome;
 

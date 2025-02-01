@@ -1,10 +1,12 @@
 package br.com.wktechnology.springboot.controllers;
 
 import br.com.wktechnology.springboot.controllers.responses.JsonUploadResponse;
-import br.com.wktechnology.springboot.dtos.PersonJson;
+import br.com.wktechnology.springboot.dtos.CandidateJson;
 import br.com.wktechnology.springboot.dtos.CandidatesOfStateDTO;
-import br.com.wktechnology.springboot.entities.Person;
-import br.com.wktechnology.springboot.repositories.PersonRepository;
+import br.com.wktechnology.springboot.dtos.ObesityRateDTO;
+import br.com.wktechnology.springboot.entities.Candidate;
+import br.com.wktechnology.springboot.repositories.CandidateRepository;
+import br.com.wktechnology.springboot.services.CandidateService;
 import br.com.wktechnology.springboot.services.ReportService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,8 +21,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static br.com.wktechnology.WktechnologyApplication.convertToPersonList;
-
 @RestController
 @RequestMapping("/api")
 public class HelloController {
@@ -28,19 +28,22 @@ public class HelloController {
     @Autowired
     private final ObjectMapper objectMapper;
     @Autowired
-    private final PersonRepository repository;
+    private final CandidateRepository repository;
     @Autowired
     private final ReportService service;
+    @Autowired
+    private final CandidateService candidateService;
 
-    public HelloController(ObjectMapper objectMapper, PersonRepository repository, ReportService service) {
+    public HelloController(ObjectMapper objectMapper, CandidateRepository repository, ReportService service, CandidateService candidateService) {
         this.objectMapper = objectMapper;
         this.repository = repository;
         this.service = service;
+        this.candidateService = candidateService;
     }
 
     @GetMapping(value = "/report")
     public ResponseEntity<String> getReport(){
-        service.getAllPeopleBMIAndTheRanges();
+//        service.getAllPeopleBMIAndTheRanges();
         return ResponseEntity.ok( "executed");
     }
 
@@ -49,6 +52,13 @@ public class HelloController {
         List<CandidatesOfStateDTO> result = service.getPeopleCountOfEachState();
         return ResponseEntity.ok( result);
     }
+
+    @GetMapping(value = "/obesity-rate")
+    public ResponseEntity<ObesityRateDTO> getObesityRate(){
+        ObesityRateDTO result = service.getObesityRate();
+        return ResponseEntity.ok(result);
+    }
+
 
     @PostMapping(value = "/uploadJson", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<JsonUploadResponse> uploadFile(@RequestParam("file") MultipartFile jsonFile) {
@@ -59,14 +69,14 @@ public class HelloController {
 
             JsonNode jsonNode = objectMapper.readTree(jsonFileBytes);
 
-            List<PersonJson> peopleJson = new ArrayList<>();
+            List<CandidateJson> peopleJson = new ArrayList<>();
             if (jsonNode.isArray()) {
                 for (JsonNode node : jsonNode) {
-                    PersonJson person = mapper.treeToValue(node, PersonJson.class);
+                    CandidateJson person = mapper.treeToValue(node, CandidateJson.class);
                     peopleJson.add(person);
                 }
             }
-            List<Person> people = convertToPersonList(peopleJson);
+            List<Candidate> people = candidateService.parseJsonListToCandidateList(peopleJson);
             savePeopleBatch(people); //Warning: Batch insert
 
             String fileName = jsonFile.getOriginalFilename();
@@ -92,7 +102,7 @@ public class HelloController {
     }
 
     @Transactional
-    public void savePeopleBatch(List<Person> people) {
+    public void savePeopleBatch(List<Candidate> people) {
         repository.saveAll(people); // Bulk save to database
     }
 }

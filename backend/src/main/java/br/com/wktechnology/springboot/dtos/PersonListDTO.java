@@ -3,13 +3,13 @@ package br.com.wktechnology.springboot.dtos;
 import java.util.List;
 
 public class PersonListDTO {
-    private List<PersonJson> people;
+    private List<CandidateJson> people;
 
-    public List<PersonJson> getPeople() {
+    public List<CandidateJson> getPeople() {
         return people;
     }
 
-    public void setPeople(List<PersonJson> people) {
+    public void setPeople(List<CandidateJson> people) {
         this.people = people;
     }
 }
