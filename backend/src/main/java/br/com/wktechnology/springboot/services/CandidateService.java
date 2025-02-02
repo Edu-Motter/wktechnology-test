@@ -3,6 +3,7 @@ package br.com.wktechnology.springboot.services;
 import br.com.wktechnology.springboot.dtos.CandidateJson;
 import br.com.wktechnology.springboot.entities.BloodType;
 import br.com.wktechnology.springboot.entities.Candidate;
+import br.com.wktechnology.springboot.entities.State;
 import br.com.wktechnology.springboot.repositories.CandidateRepository;
 import br.com.wktechnology.springboot.utils.FormatterHelper;
 import jakarta.transaction.Transactional;
@@ -51,7 +52,7 @@ public class CandidateService {
             candidate.setAddressNumber(json.getNumero());
             candidate.setNeighborhood(json.getBairro());
             candidate.setCity(json.getCidade());
-            candidate.setState(json.getEstado());
+            candidate.setState(State.fromAbbreviation(json.getEstado()));
             candidate.setHomePhone(json.getTelefoneFixo());
             candidate.setMobilePhone(json.getCelular());
             candidate.setHeightInCentimeters((int) (json.getAltura() * 100));

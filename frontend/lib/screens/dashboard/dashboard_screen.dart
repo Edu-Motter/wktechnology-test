@@ -1,15 +1,18 @@
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:dio/dio.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:wktechnology/repository/reports_repository.dart';
-import 'package:wktechnology/screens/dashboard/dashboard_viewmodel.dart';
-import 'package:wktechnology/screens/widgets/ui.dart';
+import 'package:result_dart/result_dart.dart';
+import 'package:wktechnology/screens/dashboard/reports/average_age_report.dart';
+import 'package:wktechnology/screens/dashboard/reports/bmi_report.dart';
 
+import '../../models/obesity_data.dart';
 import '../../models/report.dart';
+import '../../models/state_data.dart';
+import '../../repository/reports_repository.dart';
 import '../widgets/report_chip.dart';
+import '../widgets/ui.dart';
+import 'dashboard_viewmodel.dart';
+import 'reports/donors_report.dart';
+import 'reports/obesity_report.dart';
+import 'reports/state_report.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -20,7 +23,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final DashboardViewModel model = DashboardViewModel(
-    reportsRepository: ReportsRepositoryMock(),
+    reportsRepository: ReportsRepositoryImpl(),
   );
 
   @override
@@ -29,80 +32,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
   }
 
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://10.0.2.2:8080',
-    connectTimeout: const Duration(seconds: 5),
-    receiveTimeout: const Duration(seconds: 3),
-  ));
-
-  int? _selectedIndex;
-
   Future<void> _pickAndUploadFile(BuildContext context) async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-      if (result != null) {
-        File file = File(result.files.single.path!);
-        String fileName = file.path.split("/").last;
-
-        if (!fileName.contains('.json')) {
-          if (context.mounted) {
-            UIHelper.showError(
-              context,
-              message: 'Somente arquivos JSON podem ser enviados',
-            );
-          }
-        }
-
-        if (fileName.contains('.json')) {
-          if (context.mounted) {
-            UIHelper.showMessage(
-              context,
-              message: 'O arquivo: $fileName está sendo enviado, aguarde',
-            );
-          }
-
-          Uint8List bytes = file.readAsBytesSync();
-
-          // Create FormData with the bytes
-          FormData formData = FormData.fromMap({
-            'file': MultipartFile.fromBytes(
-              bytes,
-              filename: result.files.single.name,
-            ),
-          });
-
-          // Make the POST request
-          final response = await _dio.post(
-            '/api/uploadJson',
-            data: formData,
-            onSendProgress: (sent, total) {
-              debugPrint(
-                  'Upload Progress: ${(sent / total * 100).toStringAsFixed(2)}%');
-            },
-          );
-
-          if (response.statusCode == 200) {
-            if (context.mounted) {
-              UIHelper.showSuccess(
-                context,
-                message: 'Enviado com sucesso ($fileName)',
-              );
-            }
-          }
-        }
-      } else {
-        debugPrint('No file selected');
-      }
-    } catch (e) {
-      debugPrint('Error uploading file: $e');
-      if (context.mounted) {
-        UIHelper.showError(
-          context,
-          message: 'Error uploading file: ${e.toString()}',
-        );
-      }
-    }
+    final result = model.getJsonAndUpload();
+    result.fold(
+      (success) => UIHelper.showSuccess(context, message: success),
+      (error) => UIHelper.showError(
+        context,
+        message: 'ERROR: $error',
+      ),
+    );
   }
 
   void updateReportSelection({required Report report}) {
@@ -194,17 +132,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: ReportRender(
         report: model.selectedReport,
         fetchingData: model.fetchingData,
+        errorMessage: model.errorMessage,
       ),
     );
   }
 }
 
 class ReportRender extends StatelessWidget {
-  const ReportRender(
-      {super.key, required this.report, required this.fetchingData});
+  const ReportRender({
+    super.key,
+    required this.report,
+    required this.fetchingData,
+    required this.errorMessage,
+  });
 
   final Report report;
   final bool fetchingData;
+  final String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -219,24 +163,42 @@ class ReportRender extends StatelessWidget {
       );
     }
 
+    if (errorMessage != null) {
+      return Center(
+        child: Card(
+          elevation: 4,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Falha ao carregar relatório'),
+                Text(errorMessage!),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     if (report is DonorsReport) {
-      return Container(color: Colors.blue);
+      return DonorsReportView(data: report.getData());
     }
 
     if (report is BMIReport) {
-      return Container(color: Colors.purpleAccent);
+      return BMIReportView(data: report.getData());
     }
 
     if (report is ObesityReport) {
-      return Container(color: Colors.green);
+      return ObesityReportView(data: report.getData());
     }
 
     if (report is StatesReport) {
-      return Container(color: Colors.red);
+      return StateReportView(data: report.getData());
     }
 
     if (report is AverageAgeReport) {
-      return Container(color: Colors.yellow);
+      return AverageAgeReportView(data: report.getData());
     }
 
     return Container(color: Colors.grey);

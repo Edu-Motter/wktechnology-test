@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:wktechnology/models/average_age_data.dart';
+import 'package:wktechnology/models/average_bmi_data.dart';
+import 'package:wktechnology/models/donors_data.dart';
+import 'package:wktechnology/models/obesity_data.dart';
+import 'package:wktechnology/models/state_data.dart';
 
 enum ReportType {
   donors(label: 'Doadores', icon: Icons.bloodtype),
@@ -18,51 +23,51 @@ abstract class Report<T> {
   ReportType getType();
 }
 
-class DonorsReport implements Report<Map<String, dynamic>> {
-  Map<String, dynamic>? data;
+class DonorsReport implements Report<List<DonorsData>> {
+  List<DonorsData>? data;
 
   @override
-  Map<String, dynamic> getData() => data ?? {};
+  List<DonorsData> getData() => data ?? [];
 
   @override
   ReportType getType() => ReportType.donors;
 }
 
-class BMIReport implements Report<Map<String, String>> {
-  Map<String, String>? data;
+class BMIReport implements Report<List<BMIData>> {
+  List<BMIData>? data;
 
   @override
-  Map<String, String> getData() => data ?? {};
+  List<BMIData> getData() => data ?? [];
 
   @override
   ReportType getType() => ReportType.bmi;
 }
 
-class ObesityReport implements Report<Map<String, String>> {
-  Map<String, String>? data;
+class ObesityReport implements Report<ObesityData> {
+  ObesityData? data;
 
   @override
-  Map<String, String> getData() => data ?? {};
+  ObesityData getData() => data ?? ObesityData.empty();
 
   @override
   ReportType getType() => ReportType.obesity;
 }
 
-class AverageAgeReport implements Report<Map<String, dynamic>> {
-  Map<String, dynamic>? data;
+class AverageAgeReport implements Report<List<AverageAgeData>> {
+  List<AverageAgeData>? data;
 
   @override
-  Map<String, dynamic> getData() => data ?? {};
+  List<AverageAgeData> getData() => data ?? [];
 
   @override
   ReportType getType() => ReportType.averageAge;
 }
 
-class StatesReport implements Report<Map<String, dynamic>> {
-  Map<String, dynamic>? data;
+class StatesReport implements Report<List<StateData>> {
+  List<StateData>? data;
 
   @override
-  Map<String, dynamic> getData() => data ?? {};
+  List<StateData> getData() => data ?? [];
 
   @override
   ReportType getType() => ReportType.states;

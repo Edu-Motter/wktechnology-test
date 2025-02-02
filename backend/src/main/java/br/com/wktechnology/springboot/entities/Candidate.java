@@ -58,8 +58,9 @@ public class Candidate {
     @Column
     private String city;
 
-    @Column(length = 2)
-    private String state;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state", length = 2, nullable = false)
+    private State state;
 
     @Column(name = "home_phone")
     private String homePhone;

@@ -2,6 +2,7 @@ package br.com.wktechnology;
 
 import br.com.wktechnology.springboot.entities.BloodType;
 import br.com.wktechnology.springboot.entities.Candidate;
+import br.com.wktechnology.springboot.entities.State;
 import br.com.wktechnology.springboot.repositories.CandidateRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -42,7 +43,7 @@ public class WktechnologyApplication {
             candidate.setAddressNumber(675);
             candidate.setNeighborhood("Castro Pires");
             candidate.setCity("Teófilo Otoni");
-            candidate.setState("MG");
+            candidate.setState(State.fromAbbreviation("MG"));
             candidate.setHomePhone("(33) 3611-4613");
             candidate.setMobilePhone("(33) 98481-0191");
             candidate.setHeightInCentimeters((int) (1.53 * 100));
