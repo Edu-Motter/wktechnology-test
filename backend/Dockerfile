@@ -1,8 +1,11 @@
-FROM openjdk:17-jdk
+# Use a base image with OpenJDK Java 17 installed
+FROM openjdk:17
 
-COPY target/wk-backend-v0.0.1.jar .
+# Set the working directory in the container
+WORKDIR /app
 
-EXPOSE 8080
+# Copy the packaged Spring Boot application JAR file into the container
+COPY target/wk-backend-v0.0.1.jar /app
 
-ENTRYPOINT ["java", "-jar", "wk-backend-v0.0.1.jar"]
-
+# Specify the command to run the Spring Boot application when the container starts
+CMD ["java", "-jar", "wk-backend-v0.0.1.jar"]
