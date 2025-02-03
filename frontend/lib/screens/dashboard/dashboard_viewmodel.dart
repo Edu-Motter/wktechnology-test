@@ -26,10 +26,10 @@ class DashboardViewModel extends ChangeNotifier {
   ];
 
   bool isThisReportSelected(Report report) {
-    return report.getType() == selectedReport.getType();
+    return report.getType() == selectedReport?.getType();
   }
 
-  Report selectedReport = ObesityReport();
+  Report? selectedReport;
   void updateSelectedReport(Report report) {
     selectedReport = report;
     notifyListeners();
@@ -46,7 +46,7 @@ class DashboardViewModel extends ChangeNotifier {
       getAverageAgesByBloodType();
     }
     if (selectedReport is DonorsReport) {
-      getNumberOfDonorsByBloodType();
+      getNumberOfDonorsByBloodType(selectedReport as DonorsReport);
     }
   }
 
@@ -77,7 +77,7 @@ class DashboardViewModel extends ChangeNotifier {
 
   //getReportData ( reportData, reportType and method repo.get<>() )
   //Create a generic get to handle results
-  Future<void> getNumberOfDonorsByBloodType() async {
+  Future<void> getNumberOfDonorsByBloodType(DonorsReport report) async {
     startNewFetch();
     try {
       final result = await reportsRepository.getNumberOfDonorsByBloodType();
@@ -87,14 +87,8 @@ class DashboardViewModel extends ChangeNotifier {
 
       if (result is Success) {
         final List<DonorsData> reportData = result.getOrDefault([]);
-
-        final report = getReportByType(ReportType.donors) as DonorsReport?;
-        if (report == null) {
-          errorOnFetch(message: 'Relatório não encontrado');
-        } else {
-          report.data = reportData;
-          successOnFetch();
-        }
+        report.setData(reportData);
+        successOnFetch();
       }
     } catch (error, stack) {
       debugPrint('error in getObesityRateByGender: $error \nstack: $stack');
@@ -113,7 +107,8 @@ class DashboardViewModel extends ChangeNotifier {
       if (result is Success) {
         final List<AverageAgeData> reportData = result.getOrDefault([]);
 
-        final report = getReportByType(ReportType.averageAge) as AverageAgeReport?;
+        final report =
+            getReportByType(ReportType.averageAge) as AverageAgeReport?;
         if (report == null) {
           errorOnFetch(message: 'Relatório não encontrado');
         } else {

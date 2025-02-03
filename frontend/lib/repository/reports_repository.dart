@@ -33,7 +33,13 @@ class ReportsRepositoryImpl implements ReportsRepository {
       endpoint: 'candidates-of-each-state',
     );
     return result.fold(
-      (json) => Success(json.map((obj) => StateData.fromJson(obj)).toList()),
+      (json) {
+        final data = json.map((obj) => StateData.fromJson(obj)).toList();
+        data.sort(
+          (s1, s2) => s1.numberOfCandidates.compareTo(s2.numberOfCandidates),
+        );
+        return Success(data.reversed.toList());
+      },
       (failure) => Failure(failure),
     );
   }
@@ -55,7 +61,11 @@ class ReportsRepositoryImpl implements ReportsRepository {
       endpoint: 'average-age-by-blood-type',
     );
     return result.fold(
-      (json) => Success(json.map((o) => AverageAgeData.fromJson(o)).toList()),
+      (json) {
+        final data = json.map((o) => AverageAgeData.fromJson(o)).toList();
+        data.sort((s1, s2) => s1.averageAge.compareTo(s2.averageAge));
+        return Success(data);
+      },
       (failure) => Failure(failure),
     );
   }
@@ -65,8 +75,13 @@ class ReportsRepositoryImpl implements ReportsRepository {
     final result = await httpService.getReportDataList(
       endpoint: 'average-bmi-by-age-range',
     );
+
     return result.fold(
-      (json) => Success(json.map((o) => BMIData.fromJson(o)).toList()),
+      (json) {
+        final data = json.map((o) => BMIData.fromJson(o)).toList();
+        data.sort((b1, b2) => b1.ageRange.compareTo(b2.ageRange));
+        return Success(data);
+      },
       (failure) => Failure(failure),
     );
   }
@@ -77,7 +92,11 @@ class ReportsRepositoryImpl implements ReportsRepository {
       endpoint: 'number-of-donors-by-blood-type',
     );
     return result.fold(
-      (json) => Success(json.map((o) => DonorsData.fromJson(o)).toList()),
+      (json) {
+        final data = json.map((o) => DonorsData.fromJson(o)).toList();
+        data.sort((d1,d2) => d1.numberOfDonors.compareTo(d2.numberOfDonors));
+        return Success(data.reversed.toList());
+      },
       (failure) => Failure(failure),
     );
   }

@@ -7,6 +7,7 @@ import 'package:result_dart/result_dart.dart';
 class HttpService {
   final Dio _dio = Dio(
     BaseOptions(
+      // baseUrl: 'http://192.168.18.33:8080',
       baseUrl: 'http://10.0.2.2:8080',
       connectTimeout: const Duration(seconds: 5),
       receiveTimeout: const Duration(seconds: 3),

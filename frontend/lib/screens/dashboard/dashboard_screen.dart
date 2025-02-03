@@ -29,6 +29,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     model.addListener(() => setState(() {}));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        model.updateSelectedReport(DonorsReport());
+      });
+    });
     super.initState();
   }
 
@@ -55,52 +60,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     final title = Row(
       children: [
-        Text('WK technology', style: TextStyle(color: theme.primaryColor)),
+        SizedBox(height: 8),
+        Text(
+          'WK technology',
+          style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: theme.primaryColor),
+        ),
         Spacer(),
-        Icon(Icons.water_drop_outlined, color: theme.primaryColor),
+        Icon(
+          Icons.water_drop_outlined,
+          color: theme.primaryColor,
+          size: 32,
+        ),
       ],
     );
 
     final reportSelection = Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        SizedBox(height: 4),
         Divider(
-            height: 4,
-            color: theme.primaryColor.withValues(alpha: .5),
-            thickness: 0.5,
-            endIndent: 16,
-            indent: 16),
-        SizedBox(height: 4),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: widthPadding),
-            child: Text(
-              'Selecione um relatório:',
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(color: theme.primaryColor.withValues(alpha: .75)),
-            ),
-          ),
+          height: 4,
+          color: theme.primaryColor.withValues(alpha: .5),
+          thickness: 0.5,
+          endIndent: 16,
+          indent: 16,
         ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: Row(children: [
-            SizedBox(width: widthPadding),
-            for (int i = 0; i < model.reports.length; i++)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: ReportChip(
-                  icon: model.reports[i].getType().icon,
-                  text: model.reports[i].getType().label,
-                  isSelected: model.isThisReportSelected(model.reports[i]),
-                  onSelect: () => updateReportSelection(
-                    report: model.reports[i],
+          child: Row(
+            children: [
+              SizedBox(width: widthPadding),
+              for (int i = 0; i < model.reports.length; i++)
+                Padding(
+                  padding: EdgeInsets.only(left: i == 0 ? 0 : 8),
+                  child: ReportChip(
+                    icon: model.reports[i].getType().icon,
+                    text: model.reports[i].getType().label,
+                    isSelected: model.isThisReportSelected(model.reports[i]),
+                    onSelect: () => updateReportSelection(
+                      report: model.reports[i],
+                    ),
                   ),
                 ),
-              ),
-            SizedBox(width: widthPadding),
-          ]),
+              SizedBox(width: widthPadding),
+            ],
+          ),
         ),
         SizedBox(height: 16)
       ],
@@ -120,14 +126,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         bottom: PreferredSize(
-          preferredSize: Size(size.width, 72),
+          preferredSize: Size(size.width, 64),
           child: reportSelection,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        isExtended: false,
+      floatingActionButton: AddCandidatesButton(
         onPressed: () => _pickAndUploadFile(context),
-        child: Icon(Icons.upload),
       ),
       body: ReportRender(
         report: model.selectedReport,
@@ -146,15 +150,15 @@ class ReportRender extends StatelessWidget {
     required this.errorMessage,
   });
 
-  final Report report;
+  final Report? report;
   final bool fetchingData;
   final String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
-    if (fetchingData) {
+    if (fetchingData || report == null) {
       return Container(
-        color: Colors.grey,
+        color: Colors.white,
         child: Center(
           child: CircularProgressIndicator(
             color: Theme.of(context).primaryColor,
@@ -182,25 +186,40 @@ class ReportRender extends StatelessWidget {
     }
 
     if (report is DonorsReport) {
-      return DonorsReportView(data: report.getData());
+      return DonorsReportView(data: report?.getData());
     }
 
     if (report is BMIReport) {
-      return BMIReportView(data: report.getData());
+      return BMIReportView(data: report?.getData());
     }
 
     if (report is ObesityReport) {
-      return ObesityReportView(data: report.getData());
+      return ObesityReportView(data: report?.getData());
     }
 
     if (report is StatesReport) {
-      return StateReportView(data: report.getData());
+      return StateReportView(data: report?.getData());
     }
 
     if (report is AverageAgeReport) {
-      return AverageAgeReportView(data: report.getData());
+      return AverageAgeReportView(data: report?.getData());
     }
 
     return Container(color: Colors.grey);
+  }
+}
+
+class AddCandidatesButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const AddCandidatesButton({super.key, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton.extended(
+      onPressed: onPressed,
+      icon: const Icon(Icons.upload),
+      label: const Text("Adicionar Candidatos"),
+    );
   }
 }
