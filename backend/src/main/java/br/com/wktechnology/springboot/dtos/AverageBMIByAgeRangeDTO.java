@@ -8,11 +8,13 @@ import lombok.Getter;
 public class AverageBMIByAgeRangeDTO {
     private final String ageRange;
     private final AgeRange ageRangeType;
-    private final String averageBMI;
+    private final Double averageBMI;
+    private final String averageBMIFormatted;
 
     public AverageBMIByAgeRangeDTO(AgeRange ageRange, Double averageBMI) {
         this.ageRange = ageRange.toString();
         this.ageRangeType = ageRange;
-        this.averageBMI = FormatterHelper.formatAverage(averageBMI);
+        this.averageBMI = averageBMI;
+        this.averageBMIFormatted = FormatterHelper.formatAverage(averageBMI);
     }
 }

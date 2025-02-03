@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CandidateJson {
+public class CandidateJsonDTO {
     @JsonProperty("nome")
     private String nome;
 

@@ -8,7 +8,10 @@ import lombok.Setter;
 public class CandidatesOfStateDTO {
     private final String state;
     private final String stateFullName;
+
     private Long numberOfCandidates;
+
+    @Setter
     private Long numberOfValidDonors;
 
     public CandidatesOfStateDTO(State state, Long numberOfCandidates, Long numberOfValidDonors) {
@@ -24,11 +27,6 @@ public class CandidatesOfStateDTO {
 
     public CandidatesOfStateDTO setNumberOfCandidates(Long numberOfCandidates) {
         this.numberOfCandidates = numberOfCandidates;
-        return this;
-    }
-
-    public CandidatesOfStateDTO setNumberOfValidDonors(Long numberOfValidDonors) {
-        this.numberOfValidDonors = numberOfValidDonors;
         return this;
     }
 }

@@ -18,31 +18,59 @@ import java.util.Map;
 public class ReportService {
 
     @Autowired
-    private final CandidateRepository candidateRepository;
+    private final CandidateRepository repository;
 
-    public ReportService(CandidateRepository candidateRepository) {
-        this.candidateRepository = candidateRepository;
+    public ReportService(CandidateRepository repository) {
+        this.repository = repository;
     }
 
     public List<CandidatesOfStateDTO> getPeopleCountOfEachState(){
-        final List<Candidate> candidates = candidateRepository.findAll();
+        final List<Candidate> candidates = repository.findAll();
 
-        Map<State, CandidatesOfStateDTO> stateMap = new HashMap<>();
+        Map<State, CandidatesOfStateDTO> dtoHashMap = new HashMap<>();
 
         for (Candidate candidate : candidates) {
-            final CandidatesOfStateDTO candidatesOfState = stateMap.getOrDefault(candidate.getState(), CandidatesOfStateDTO.empty(candidate.getState()));
-            final int isValidCandidate = candidate.getValid() ? 1 : 0;
-            stateMap
-                    .computeIfAbsent(candidate.getState(), type -> candidatesOfState)
-                    .setNumberOfCandidates(candidatesOfState.getNumberOfCandidates() + 1)
-                    .setNumberOfValidDonors(candidatesOfState.getNumberOfValidDonors() + isValidCandidate);
+            final CandidatesOfStateDTO emptyDTO = dtoHashMap.getOrDefault(candidate.getState(), CandidatesOfStateDTO.empty(candidate.getState()));
+            final int isValidDonor = candidate.getValid() ? 1 : 0;
+            dtoHashMap
+                    .computeIfAbsent(candidate.getState(), type -> emptyDTO)
+                    .setNumberOfCandidates(emptyDTO.getNumberOfCandidates() + 1)
+                    .setNumberOfValidDonors(emptyDTO.getNumberOfValidDonors() + isValidDonor);
         }
 
-        return stateMap.values().stream().toList();
+        return dtoHashMap.values().stream().toList();
     }
 
-    public List<ObesityRateDTO> getObesityRate(){
-        List<CandidateDTO> candidates = candidateRepository.getCandidates();
+    public List<AverageBMIByAgeRangeDTO> getAverageBMIByAgeRange(){
+        List<CandidateDTO> candidates = repository.getCandidates();
+
+        Map<AgeRange, List<Double>> ageRangeMap = new HashMap<>();
+        for (CandidateDTO candidate : candidates) {
+            final AgeRange ageRange = AgeRange.getAgeRangeOf(candidate.age());
+            ageRangeMap
+                    .computeIfAbsent(ageRange, range -> new ArrayList<>())
+                    .add(candidate.bmi());
+        }
+
+        List<AverageBMIByAgeRangeDTO> result = new ArrayList<>();
+        for (Map.Entry<AgeRange, List<Double>> entry : ageRangeMap.entrySet()) {
+            AgeRange ageRange = entry.getKey();
+            List<Double> bodyMassIndexes = entry.getValue();
+
+            double sum = 0.0;
+            for (Double bodyMassIndex : bodyMassIndexes) {
+                sum += bodyMassIndex;
+            }
+
+            double averageBMI = bodyMassIndexes.isEmpty() ? 0.0 : sum / bodyMassIndexes.size();
+            result.add(new AverageBMIByAgeRangeDTO(ageRange, averageBMI));
+        }
+
+        return result;
+    }
+
+    public List<ObesityRateByGenderDTO> getObesityRateByGender(){
+        List<CandidateDTO> candidates = repository.getCandidates();
 
         ArrayList<CandidateDTO> men = new ArrayList<>();
         ArrayList<CandidateDTO> obesityMen = new ArrayList<>();
@@ -51,16 +79,17 @@ public class ReportService {
 
         /// Considerado obeso quem tem IMC > 30
         for (CandidateDTO candidate : candidates){
-            if (candidate.getGender().toUpperCase().startsWith("F")){
+            if (candidate.gender().toUpperCase().startsWith("F")){
                 women.add(candidate);
-                if (candidate.getBmi() > 30) obesityWomen.add(candidate);
+                if (candidate.bmi() > 30) obesityWomen.add(candidate);
             }
 
-            if (candidate.getGender().toUpperCase().startsWith("M")) {
+            if (candidate.gender().toUpperCase().startsWith("M")) {
                 men.add(candidate);
-                if (candidate.getBmi() > 30) obesityMen.add(candidate);
+                if (candidate.bmi() > 30) obesityMen.add(candidate);
             }
         }
+
         double maleObesityRate = 0.0;
         if (!men.isEmpty()){
             maleObesityRate  = (double) obesityMen.size() / men.size();
@@ -71,17 +100,17 @@ public class ReportService {
             femaleObesityRate  = (double) obesityWomen.size() / women.size();
         }
 
-        return List.of(new ObesityRateDTO("women", femaleObesityRate), new ObesityRateDTO("men", maleObesityRate));
+        return List.of(new ObesityRateByGenderDTO("women", femaleObesityRate), new ObesityRateByGenderDTO("men", maleObesityRate));
     }
 
-    public List<AverageAgeByBloodTypeDTO> getAverageAgesByBloodType(){
-        List<CandidateBloodTypeAndAgeDTO> dtos = candidateRepository.getCandidatesBloodTypeAndAge();
+    public List<AverageAgeByBloodTypeDTO> getAverageAgeByBloodType(){
+        List<CandidateBloodTypeAndAgeDTO> candidates = repository.getCandidatesBloodTypeAndAge();
 
         Map<BloodType, List<Integer>> bloodTypeMap = new HashMap<>();
-        for (CandidateBloodTypeAndAgeDTO candidate : dtos) {
+        for (CandidateBloodTypeAndAgeDTO candidate : candidates) {
             bloodTypeMap
-                    .computeIfAbsent(candidate.getBloodType(), type -> new ArrayList<>())
-                    .add(candidate.getAge());
+                    .computeIfAbsent(candidate.bloodType(), type -> new ArrayList<>())
+                    .add(candidate.age());
         }
 
         List<AverageAgeByBloodTypeDTO> result = new ArrayList<>();
@@ -98,78 +127,22 @@ public class ReportService {
         return result;
     }
 
-    public List<AverageBMIByAgeRangeDTO> getAverageBMIByAgeRange(){
-        List<CandidateDTO> candidates = candidateRepository.getCandidates();
+    public List<NumberOfDonorsByBloodTypeDTO> getNumberOfDonorsByBloodType(){
+        List<NumberOfDonorsByBloodTypeDTO> donorsByBloodType = repository.getValidDonorsByBloodType();
 
-        Map<AgeRange, List<Double>> ageRangeMap = new HashMap<>();
-        for (CandidateDTO candidate : candidates) {
-            final AgeRange ageRange = AgeRange.getAgeRangeOf(candidate.getAge());
-            ageRangeMap
-                    .computeIfAbsent(ageRange, range -> new ArrayList<>())
-                    .add(candidate.getBmi());
-        }
-
-        List<AverageBMIByAgeRangeDTO> result = new ArrayList<>();
-        for (Map.Entry<AgeRange, List<Double>> entry : ageRangeMap.entrySet()) {
-            AgeRange ageRange = entry.getKey();
-            List<Double> bmis = entry.getValue();
-
-            double sum = 0.0;
-            for (Double bmi : bmis) {
-                sum += bmi;
-            }
-            double averageBmi = bmis.isEmpty() ? 0.0 : sum / bmis.size();
-
-            result.add(new AverageBMIByAgeRangeDTO(ageRange, averageBmi));
-        }
-
-        return result;
-    }
-
-    public List<NumberOfDonorsByBloodType> getNumberOfDonorsByBloodType(){
-        List<DonorsByBloodTypeDTO> donorsByBloodType = candidateRepository.getValidDonorsByBloodType();
-        List<NumberOfDonorsByBloodType> result = new ArrayList<>();
-
+        List<NumberOfDonorsByBloodTypeDTO> result = new ArrayList<>();
         for (BloodType receiverBloodType : BloodType.values()) {
             long totalDonors = 0;
 
-            for (DonorsByBloodTypeDTO donor : donorsByBloodType) {
+            for (NumberOfDonorsByBloodTypeDTO donor : donorsByBloodType) {
                 if (receiverBloodType.canReceiveFrom(donor.getBloodType())) {
-                    totalDonors += donor.getQuantityOfDonors();
+                    totalDonors += donor.getNumberOfDonors();
                 }
             }
 
-            result.add(new NumberOfDonorsByBloodType(receiverBloodType, totalDonors));
+            result.add(new NumberOfDonorsByBloodTypeDTO(receiverBloodType, totalDonors));
         }
 
         return result;
     }
-
-//   public HashMap<Integer, List<Double>> getAllPeopleBMIAndTheRanges() {
-//        List<CandidateDTO> data = candidateRepository.findBMIData();
-//
-//        HashMap<Integer, List<Double>> report = new HashMap<>();
-//
-//        for (CandidateDTO person : data) {
-//            Integer years = person.getYearsOfLife();
-//            double bmi = person.calculateBMI();
-//
-//            Integer range = years / 10;
-//
-//            System.out.println("adding person " + person.getYearsOfLife() + " in range: " +range);
-//
-//            if (report.containsKey(range)) {
-//                List<Double> bmis = report.get(range);
-//                ArrayList<Double> newBmis = new ArrayList<>();
-//                newBmis.addAll(bmis);
-//                newBmis.add(bmi);
-//                report.put(range,newBmis );
-//            } else {
-//                report.put(range, List.of(bmi));
-//            }
-//        }
-//
-//        System.out.println(report);
-//        return report;
-//    }
 }

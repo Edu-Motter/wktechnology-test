@@ -10,9 +10,9 @@
 	</parent>
 	<groupId>br.com</groupId>
 	<artifactId>wk-backend</artifactId>
-	<version>v0.0.1</version>
+	<version>v1.0.0</version>
 	<name>wktechnology</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Spring Boot Application</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -65,7 +65,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -74,5 +73,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

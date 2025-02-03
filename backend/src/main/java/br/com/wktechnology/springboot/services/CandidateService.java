@@ -1,6 +1,6 @@
 package br.com.wktechnology.springboot.services;
 
-import br.com.wktechnology.springboot.dtos.CandidateJson;
+import br.com.wktechnology.springboot.dtos.CandidateJsonDTO;
 import br.com.wktechnology.springboot.entities.BloodType;
 import br.com.wktechnology.springboot.entities.Candidate;
 import br.com.wktechnology.springboot.entities.State;
@@ -26,9 +26,9 @@ public class CandidateService {
 
     private final Logger log = LoggerFactory.getLogger(CandidateService.class);
 
-    public List<Candidate> parseJsonListToCandidateList(List<CandidateJson> jsonList) {
+    public List<Candidate> parseJsonListToCandidateList(List<CandidateJsonDTO> jsonList) {
         List<Candidate> candidates = new ArrayList<>();
-        for (CandidateJson json : jsonList){
+        for (CandidateJsonDTO json : jsonList){
 
             LocalDate birthDate = FormatterHelper.parseDate(json.getDataNasc());
 

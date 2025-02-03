@@ -8,11 +8,13 @@ import lombok.Getter;
 public class AverageAgeByBloodTypeDTO {
     private final BloodType bloodType;
     private final String bloodTypeLabel;
-    private final String averageAge;
+    private final Double averageAge;
+    private final String averageAgeFormatted;
 
     public AverageAgeByBloodTypeDTO(BloodType bloodType, Double averageAge) {
         this.bloodType = bloodType;
         this.bloodTypeLabel = bloodType.toString();
-        this.averageAge = FormatterHelper.formatAverage(averageAge);
+        this.averageAge = averageAge;
+        this.averageAgeFormatted = FormatterHelper.formatAverage(averageAge);
     }
 }
