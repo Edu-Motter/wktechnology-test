@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:wktechnology/models/obesity_data.dart';
+import 'package:wktechnology/models/data/obesity_data.dart';
 
+import '../../widgets/empty_report_message.dart';
 import '../../widgets/report_header.dart';
 
 class ObesityReportView extends StatelessWidget {
-  const ObesityReportView({super.key, required this.data});
+  const ObesityReportView({
+    super.key,
+    required this.data,
+    required this.empty,
+  });
 
   final List<ObesityData> data;
+  final bool? empty;
 
   String getLabel(String gender) {
     switch (gender) {
@@ -43,6 +49,8 @@ class ObesityReportView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (empty ?? true) return EmptyReportMessage();
+
     return SingleChildScrollView(
       child: Column(
         children: [

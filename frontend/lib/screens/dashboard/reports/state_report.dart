@@ -1,21 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:wktechnology/models/state_data.dart';
+import 'package:wktechnology/models/data/state_data.dart';
 
+import '../../widgets/empty_report_message.dart';
 import '../../widgets/report_header.dart';
 
 class StateReportView extends StatelessWidget {
-  const StateReportView({super.key, required this.data});
+  const StateReportView({
+    super.key,
+    required this.data,
+    required this.empty,
+  });
 
   final List<StateData> data;
+  final bool? empty;
 
   @override
   Widget build(BuildContext context) {
+    if (empty ?? true) return EmptyReportMessage();
+
     return SingleChildScrollView(
       child: Column(
         children: [
           const ReportHeader(
             title: 'Candidatos por Estado',
-            subtitle: 'Número de candidatos a doar sangue em cada estado do Brasil',
+            subtitle:
+                'Número de candidatos e doadores de sangue em cada estado do Brasil',
             icon: Icons.location_city,
           ),
           ListView.builder(
@@ -29,6 +38,7 @@ class StateReportView extends StatelessWidget {
                 state: stateData.state,
                 stateFullName: stateData.stateFullName,
                 numberOfCandidates: stateData.numberOfCandidates,
+                numberOfValidDonors: stateData.numberOfValidDonors,
               );
             },
           ),
@@ -42,12 +52,14 @@ class StateCard extends StatelessWidget {
   final String state;
   final String stateFullName;
   final int numberOfCandidates;
+  final int numberOfValidDonors;
 
   const StateCard({
     super.key,
     required this.state,
     required this.stateFullName,
     required this.numberOfCandidates,
+    required this.numberOfValidDonors,
   });
 
   @override
@@ -95,13 +107,11 @@ class StateCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
                     children: [
                       Text(
                         numberOfCandidates.toString(),
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -109,7 +119,27 @@ class StateCard extends StatelessWidget {
                       Text(
                         'Candidatos',
                         style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        numberOfValidDonors.toString(),
+                        style: const TextStyle(
                           fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Possíveis doadores',
+                        style: TextStyle(
+                          fontSize: 12,
                           color: Colors.grey[600],
                         ),
                       ),

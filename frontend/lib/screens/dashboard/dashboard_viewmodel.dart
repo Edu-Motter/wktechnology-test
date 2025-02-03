@@ -3,197 +3,88 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:result_dart/result_dart.dart';
-import 'package:wktechnology/models/average_age_data.dart';
-import 'package:wktechnology/models/average_bmi_data.dart';
-import 'package:wktechnology/models/donors_data.dart';
-import 'package:wktechnology/models/obesity_data.dart';
-import 'package:wktechnology/models/state_data.dart';
 import 'package:wktechnology/repository/reports_repository.dart';
+import 'package:wktechnology/screens/dashboard/reports/average_age_report.dart';
+import 'package:wktechnology/screens/dashboard/reports/bmi_report.dart';
+import 'package:wktechnology/screens/dashboard/reports/donors_report.dart';
+import 'package:wktechnology/screens/dashboard/reports/obesity_report.dart';
+import 'package:wktechnology/screens/dashboard/reports/state_report.dart';
 
-import '../../models/report.dart';
+import '../../models/reports/average_age_report.dart';
+import '../../models/reports/bmi_report.dart';
+import '../../models/reports/donors_report.dart';
+import '../../models/reports/obesity_report.dart';
+import '../../models/reports/report.dart';
+import '../../models/reports/states_report.dart';
 
 class DashboardViewModel extends ChangeNotifier {
   DashboardViewModel({required this.reportsRepository});
 
   final ReportsRepository reportsRepository;
 
-  final List<Report> reports = [
-    DonorsReport(),
-    BMIReport(),
-    ObesityReport(),
-    StatesReport(),
-    AverageAgeReport(),
-  ];
-
-  bool isThisReportSelected(Report report) {
-    return report.getType() == selectedReport?.getType();
-  }
-
   Report? selectedReport;
-  void updateSelectedReport(Report report) {
-    selectedReport = report;
-    notifyListeners();
-    if (selectedReport is ObesityReport) {
-      getObesityRateByGender();
-    }
-    if (selectedReport is StatesReport) {
-      getCandidatesOfEachState();
-    }
-    if (selectedReport is BMIReport) {
-      getAverageBMIByAgeRange();
-    }
-    if (selectedReport is AverageAgeReport) {
-      getAverageAgesByBloodType();
-    }
-    if (selectedReport is DonorsReport) {
-      getNumberOfDonorsByBloodType(selectedReport as DonorsReport);
-    }
-  }
-
-  Report? getReportByType(ReportType type) {
-    return reports.where((r) => r.getType() == type).firstOrNull;
-  }
-
   bool fetchingData = false;
   String? errorMessage;
 
-  void startNewFetch() {
-    errorMessage = null;
-    fetchingData = true;
-    notifyListeners();
-  }
+  final List<Report> reports = [
+    DonorsReport(
+      builder: (data, empty) => DonorsReportView(data: data, empty: empty),
+      fetch: () async {},
+    ),
+    BMIReport(
+      builder: (data, empty) => BMIReportView(data: data, empty: empty),
+      fetch: () async {},
+    ),
+    ObesityReport(
+        builder: (data, empty) => ObesityReportView(data: data, empty: empty),
+        fetch: () async {}),
+    StatesReport(
+      builder: (data, empty) => StateReportView(data: data, empty: empty),
+      fetch: () async {},
+    ),
+    AverageAgeReport(
+      builder: (data, empty) => AverageAgeReportView(data: data, empty: empty),
+      fetch: () async {},
+    ),
+  ];
 
-  void errorOnFetch({required String message}) {
-    errorMessage = message;
-    fetchingData = false;
-    notifyListeners();
-  }
-
-  void successOnFetch() {
-    errorMessage = null;
-    fetchingData = false;
-    notifyListeners();
-  }
-
-  //getReportData ( reportData, reportType and method repo.get<>() )
-  //Create a generic get to handle results
-  Future<void> getNumberOfDonorsByBloodType(DonorsReport report) async {
+  Future<void> fetchReportData() async {
     startNewFetch();
     try {
-      final result = await reportsRepository.getNumberOfDonorsByBloodType();
-      if (result is Error) {
-        errorOnFetch(message: 'Falha ao carregar relatório, tente novamente');
+      Result? result;
+      if (selectedReport is StatesReport) {
+        result = await reportsRepository.getCandidatesOfEachState();
+      }
+
+      if (selectedReport is BMIReport) {
+        result = await reportsRepository.getAverageBMIByAgeRange();
+      }
+      if (selectedReport is ObesityReport) {
+        result = await reportsRepository.getObesityRateByGender();
+      }
+
+      if (selectedReport is AverageAgeReport) {
+        result = await reportsRepository.getAverageAgeByBloodType();
+      }
+      if (selectedReport is DonorsReport) {
+        result = await reportsRepository.getNumberOfDonorsByBloodType();
       }
 
       if (result is Success) {
-        final List<DonorsData> reportData = result.getOrDefault([]);
-        report.setData(reportData);
+        selectedReport?.setData((result?.getOrNull()) as List<dynamic>?);
         successOnFetch();
+      } else {
+        errorOnFetch(
+          message: 'Falha ao carregar relatório, tente novamente',
+        );
       }
     } catch (error, stack) {
-      debugPrint('error in getObesityRateByGender: $error \nstack: $stack');
-      errorOnFetch(message: 'Ocorreu um erro interno');
-    }
-  }
-
-  Future<void> getAverageAgesByBloodType() async {
-    startNewFetch();
-    try {
-      final result = await reportsRepository.getAverageAgeByBloodType();
-      if (result is Error) {
-        errorOnFetch(message: 'Falha ao carregar relatório, tente novamente');
-      }
-
-      if (result is Success) {
-        final List<AverageAgeData> reportData = result.getOrDefault([]);
-
-        final report =
-            getReportByType(ReportType.averageAge) as AverageAgeReport?;
-        if (report == null) {
-          errorOnFetch(message: 'Relatório não encontrado');
-        } else {
-          report.data = reportData;
-          successOnFetch();
-        }
-      }
-    } catch (error, stack) {
-      debugPrint('error in getObesityRateByGender: $error \nstack: $stack');
-      errorOnFetch(message: 'Ocorreu um erro interno');
-    }
-  }
-
-  Future<void> getAverageBMIByAgeRange() async {
-    startNewFetch();
-    try {
-      final result = await reportsRepository.getAverageBMIByAgeRange();
-      if (result is Error) {
-        errorOnFetch(message: 'Falha ao carregar relatório, tente novamente');
-      }
-
-      if (result is Success) {
-        final List<BMIData> reportData = result.getOrDefault([]);
-
-        final report = getReportByType(ReportType.bmi) as BMIReport?;
-        if (report == null) {
-          errorOnFetch(message: 'Relatório não encontrado');
-        } else {
-          report.data = reportData;
-          successOnFetch();
-        }
-      }
-    } catch (error, stack) {
-      debugPrint('error in getObesityRateByGender: $error \nstack: $stack');
-      errorOnFetch(message: 'Ocorreu um erro interno');
-    }
-  }
-
-  Future<void> getCandidatesOfEachState() async {
-    startNewFetch();
-    try {
-      final result = await reportsRepository.getCandidatesOfEachState();
-      if (result is Error) {
-        errorOnFetch(message: 'Falha ao carregar relatório, tente novamente');
-      }
-
-      if (result is Success) {
-        final List<StateData> reportData = result.getOrDefault([]);
-
-        final report = getReportByType(ReportType.states) as StatesReport?;
-        if (report == null) {
-          errorOnFetch(message: 'Relatório não encontrado');
-        } else {
-          report.data = reportData;
-          successOnFetch();
-        }
-      }
-    } catch (error, stack) {
-      debugPrint('error in getObesityRateByGender: $error \nstack: $stack');
-      errorOnFetch(message: 'Ocorreu um erro interno');
-    }
-  }
-
-  Future<void> getObesityRateByGender() async {
-    startNewFetch();
-    try {
-      final result = await reportsRepository.getObesityRateByGender();
-      if (result is Error) {
-        errorOnFetch(message: 'Falha ao carregar relatório, tente novamente');
-      }
-
-      if (result is Success) {
-        final List<ObesityData> reportData = result.getOrDefault([]);
-
-        final report = getReportByType(ReportType.obesity) as ObesityReport?;
-        if (report == null) {
-          errorOnFetch(message: 'Relatório não encontrado');
-        } else {
-          report.data = reportData;
-          successOnFetch();
-        }
-      }
-    } catch (error, stack) {
-      debugPrint('error in getObesityRateByGender: $error \nstack: $stack');
-      errorOnFetch(message: 'Ocorreu um erro interno');
+      debugPrint(
+        'error in ${selectedReport.runtimeType} fetch: $error \nstack: $stack',
+      );
+      errorOnFetch(
+        message: 'Ocorreu um erro desconhecido',
+      );
     }
   }
 
@@ -211,9 +102,43 @@ class DashboardViewModel extends ChangeNotifier {
 
       File json = File(result.files.single.path!);
       String fileName = result.files.single.name;
-      return await reportsRepository.uploadJson(fileName, json);
+      final uploadResult = await reportsRepository.uploadJson(fileName, json);
+      executeRefresh();
+      return uploadResult;
     } catch (e) {
       return Failure(Exception(e));
     }
+  }
+
+  bool isThisReportSelected(index) {
+    return reports[index].runtimeType == selectedReport?.runtimeType;
+  }
+
+  void executeRefresh() {
+    selectedReport ??= reports.first;
+    updateSelectedReport(selectedReport!);
+  }
+
+  void updateSelectedReport(Report report) {
+    selectedReport = report;
+    fetchReportData();
+  }
+
+  void startNewFetch() {
+    errorMessage = null;
+    fetchingData = true;
+    notifyListeners();
+  }
+
+  void errorOnFetch({required String message}) {
+    errorMessage = message;
+    fetchingData = false;
+    notifyListeners();
+  }
+
+  void successOnFetch() {
+    errorMessage = null;
+    fetchingData = false;
+    notifyListeners();
   }
 }

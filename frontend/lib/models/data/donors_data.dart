@@ -16,25 +16,4 @@ class DonorsData {
       bloodTypeLabel: json['bloodTypeLabel'] as String,
     );
   }
-
-  factory DonorsData.empty() {
-    return DonorsData(
-      bloodType: '',
-      numberOfDonors: 0,
-      bloodTypeLabel: '',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'bloodType': bloodType,
-      'numberOfDonors': numberOfDonors,
-      'bloodTypeLabel': bloodTypeLabel,
-    };
-  }
-
-  @override
-  String toString() {
-    return 'BloodDonorData(bloodType: $bloodType, numberOfDonors: $numberOfDonors, bloodTypeLabel: $bloodTypeLabel)';
-  }
 }
