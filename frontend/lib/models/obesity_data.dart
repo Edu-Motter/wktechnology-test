@@ -1,23 +1,23 @@
 class ObesityData {
-  final double maleObesityRate;
-  final double femaleObesityRate;
+  final String gender;
+  final double obesityRate;
 
   ObesityData({
-    required this.maleObesityRate,
-    required this.femaleObesityRate,
+    required this.gender,
+    required this.obesityRate,
   });
 
   factory ObesityData.fromJson(Map<String, dynamic> json) {
     return ObesityData(
-      maleObesityRate: json['maleObesityRate'] as double,
-      femaleObesityRate: json['femaleObesityRate'] as double,
+      gender: json['gender'] as String,
+      obesityRate: json['obesityRate'] as double,
     );
   }
 
   factory ObesityData.empty() {
     return ObesityData(
-      maleObesityRate: 0,
-      femaleObesityRate: 0,
+      gender: '',
+      obesityRate: 0,
     );
   }
 }

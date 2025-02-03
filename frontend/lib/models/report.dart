@@ -54,17 +54,17 @@ class BMIReport implements Report<List<BMIData>> {
   }
 }
 
-class ObesityReport implements Report<ObesityData> {
-  ObesityData? data;
+class ObesityReport implements Report<List<ObesityData>> {
+  List<ObesityData>? data;
 
   @override
-  ObesityData getData() => data ?? ObesityData.empty();
+  List<ObesityData> getData() => data ?? [];
 
   @override
   ReportType getType() => ReportType.obesity;
 
   @override
-  void setData(ObesityData newData) {
+  void setData(List<ObesityData> newData) {
     data = newData;
   }
 }

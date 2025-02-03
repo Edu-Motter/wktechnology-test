@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,13 +24,9 @@ public class CandidateService {
     @Autowired
     CandidateRepository repository;
 
-    private Logger log = LoggerFactory.getLogger(CandidateService.class);
-
-    //TODO: Unit test in this service
+    private final Logger log = LoggerFactory.getLogger(CandidateService.class);
 
     public List<Candidate> parseJsonListToCandidateList(List<CandidateJson> jsonList) {
-
-
         List<Candidate> candidates = new ArrayList<>();
         for (CandidateJson json : jsonList){
 

@@ -3,9 +3,7 @@ import 'package:result_dart/result_dart.dart';
 import 'package:wktechnology/screens/dashboard/reports/average_age_report.dart';
 import 'package:wktechnology/screens/dashboard/reports/bmi_report.dart';
 
-import '../../models/obesity_data.dart';
 import '../../models/report.dart';
-import '../../models/state_data.dart';
 import '../../repository/reports_repository.dart';
 import '../widgets/report_chip.dart';
 import '../widgets/ui.dart';

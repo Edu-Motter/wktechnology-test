@@ -6,12 +6,43 @@ import '../../widgets/report_header.dart';
 class ObesityReportView extends StatelessWidget {
   const ObesityReportView({super.key, required this.data});
 
-  final ObesityData data;
+  final List<ObesityData> data;
+
+  String getLabel(String gender) {
+    switch (gender) {
+      case 'women':
+        return 'Entre as mulheres';
+      case 'men':
+        return 'Entre os homens';
+      default:
+        return 'Não informado';
+    }
+  }
+
+  MaterialColor getColor(String gender) {
+    switch (gender) {
+      case 'women':
+        return Colors.pink;
+      case 'men':
+        return Colors.blue;
+      default:
+        return Colors.orange;
+    }
+  }
+
+  IconData getIcon(String gender) {
+    switch (gender) {
+      case 'women':
+        return Icons.female;
+      case 'men':
+        return Icons.male;
+      default:
+        return Icons.monitor_weight;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<double> genders = [data.femaleObesityRate, data.maleObesityRate];
-
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -23,14 +54,15 @@ class ObesityReportView extends StatelessWidget {
           ),
           ListView.builder(
             shrinkWrap: true,
-            itemCount: genders.length,
+            itemCount: data.length,
             physics: NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
-              final obesityRate = genders[index];
+              final obesityData = data[index];
               return CustomObesityCard(
-                gender: index == 0 ? 'Entre as mulheres' : 'Entre os homens',
-                color: index == 0 ? Colors.pink : Colors.lightBlue,
-                obesityRate: obesityRate,
+                icon: getIcon(obesityData.gender),
+                color: getColor(obesityData.gender),
+                gender: getLabel(obesityData.gender),
+                obesityRate: obesityData.obesityRate,
               );
             },
           ),
@@ -44,12 +76,14 @@ class CustomObesityCard extends StatelessWidget {
   final String gender;
   final double obesityRate;
   final MaterialColor color;
+  final IconData icon;
 
   const CustomObesityCard({
     super.key,
     required this.gender,
     required this.obesityRate,
     required this.color,
+    required this.icon,
   });
 
   @override
@@ -86,21 +120,21 @@ class CustomObesityCard extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Container(
-              width: 120,
+              width: 136,
               height: 72,
               decoration: BoxDecoration(
                 color: color.withValues(alpha: .10),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Column(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.monitor_weight,
+                    icon,
                     color: color,
-                    size: 24,
+                    size: 32,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(width: 8),
                   Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,

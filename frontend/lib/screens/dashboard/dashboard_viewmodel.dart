@@ -181,7 +181,7 @@ class DashboardViewModel extends ChangeNotifier {
       }
 
       if (result is Success) {
-        final ObesityData reportData = result.getOrDefault(ObesityData.empty());
+        final List<ObesityData> reportData = result.getOrDefault([]);
 
         final report = getReportByType(ReportType.obesity) as ObesityReport?;
         if (report == null) {

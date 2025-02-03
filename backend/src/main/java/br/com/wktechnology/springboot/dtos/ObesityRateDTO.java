@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public class ObesityRateDTO {
-    private final Double maleObesityRate;
-    private final Double  femaleObesityRate;
+    private final String gender;
+    private final Double  obesityRate;
 
-    public ObesityRateDTO(Double maleObesityRate, Double femaleObesityRate) {
-        this.maleObesityRate = maleObesityRate;
-        this.femaleObesityRate = femaleObesityRate;
+    public ObesityRateDTO(String gender, Double obesityRate) {
+        this.gender = gender;
+        this.obesityRate = obesityRate;
     }
 }

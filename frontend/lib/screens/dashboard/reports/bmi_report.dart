@@ -14,9 +14,9 @@ class BMIReportView extends StatelessWidget {
       child: Column(
         children: [
           const ReportHeader(
-            title: 'IMC médio',
+            title: 'IMC médio / Faixa de Idade',
             subtitle: 'IMC médio dos candidatos considerando faixa de idade'
-                ' de dez em dez anos, \n\nExemplo: 31 até 40 ou 81 até 90 anos',
+                ' de dez em dez anos',
             icon: Icons.scale,
           ),
           ListView.builder(

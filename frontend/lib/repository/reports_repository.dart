@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:result_dart/result_dart.dart';
 import 'package:wktechnology/models/average_age_data.dart';
@@ -17,7 +16,7 @@ abstract class ReportsRepository {
 
   Future<Result<List<BMIData>>> getAverageBMIByAgeRange();
 
-  Future<Result<ObesityData>> getObesityRateByGender();
+  Future<Result<List<ObesityData>>> getObesityRateByGender();
 
   Future<Result<List<AverageAgeData>>> getAverageAgeByBloodType();
 
@@ -45,12 +44,12 @@ class ReportsRepositoryImpl implements ReportsRepository {
   }
 
   @override
-  Future<Result<ObesityData>> getObesityRateByGender() async {
-    final result = await httpService.getReportDataMap(
+  Future<Result<List<ObesityData>>> getObesityRateByGender() async {
+    final result = await httpService.getReportDataList(
       endpoint: 'obesity-rate-by-gender',
     );
     return result.fold(
-      (json) => Success(ObesityData.fromJson(json)),
+      (json) => Success(json.map((o) => ObesityData.fromJson(o)).toList()),
       (failure) => Failure(failure),
     );
   }
@@ -94,7 +93,7 @@ class ReportsRepositoryImpl implements ReportsRepository {
     return result.fold(
       (json) {
         final data = json.map((o) => DonorsData.fromJson(o)).toList();
-        data.sort((d1,d2) => d1.numberOfDonors.compareTo(d2.numberOfDonors));
+        data.sort((d1, d2) => d1.numberOfDonors.compareTo(d2.numberOfDonors));
         return Success(data.reversed.toList());
       },
       (failure) => Failure(failure),
@@ -126,14 +125,18 @@ class ReportsRepositoryMock implements ReportsRepository {
   Future<void> mockDelay() => Future.delayed(mockDelayDuration);
 
   @override
-  Future<Result<ObesityData>> getObesityRateByGender() async {
+  Future<Result<List<ObesityData>>> getObesityRateByGender() async {
     await mockDelay();
-    return Success(
+    return Success([
       ObesityData(
-        maleObesityRate: 25,
-        femaleObesityRate: 20,
+        gender: 'women',
+        obesityRate: 15,
       ),
-    );
+      ObesityData(
+        gender: 'men',
+        obesityRate: 25,
+      ),
+    ]);
   }
 
   @override

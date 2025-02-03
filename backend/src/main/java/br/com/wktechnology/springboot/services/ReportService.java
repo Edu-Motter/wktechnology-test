@@ -3,18 +3,21 @@ package br.com.wktechnology.springboot.services;
 import br.com.wktechnology.springboot.dtos.*;
 import br.com.wktechnology.springboot.entities.AgeRange;
 import br.com.wktechnology.springboot.entities.BloodType;
+import br.com.wktechnology.springboot.entities.Candidate;
+import br.com.wktechnology.springboot.entities.State;
 import br.com.wktechnology.springboot.repositories.CandidateRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ReportService {
 
+    @Autowired
     private final CandidateRepository candidateRepository;
 
     public ReportService(CandidateRepository candidateRepository) {
@@ -22,26 +25,40 @@ public class ReportService {
     }
 
     public List<CandidatesOfStateDTO> getPeopleCountOfEachState(){
-        return candidateRepository.countByState();
+        final List<Candidate> candidates = candidateRepository.findAll();
+
+        Map<State, CandidatesOfStateDTO> stateMap = new HashMap<>();
+
+        for (Candidate candidate : candidates) {
+            final CandidatesOfStateDTO candidatesOfState = stateMap.getOrDefault(candidate.getState(), CandidatesOfStateDTO.empty(candidate.getState()));
+            final int isValidCandidate = candidate.getValid() ? 1 : 0;
+            stateMap
+                    .computeIfAbsent(candidate.getState(), type -> candidatesOfState)
+                    .setNumberOfCandidates(candidatesOfState.getNumberOfCandidates() + 1)
+                    .setNumberOfValidDonors(candidatesOfState.getNumberOfValidDonors() + isValidCandidate);
+        }
+
+        return stateMap.values().stream().toList();
     }
 
-    public ObesityRateDTO getObesityRate(){
-        List<CandidateDTO> bmis = candidateRepository.getCandidates();
+    public List<ObesityRateDTO> getObesityRate(){
+        List<CandidateDTO> candidates = candidateRepository.getCandidates();
 
         ArrayList<CandidateDTO> men = new ArrayList<>();
         ArrayList<CandidateDTO> obesityMen = new ArrayList<>();
         ArrayList<CandidateDTO> women = new ArrayList<>();
         ArrayList<CandidateDTO> obesityWomen = new ArrayList<>();
 
-        for (CandidateDTO bmi : bmis){
-            if (bmi.getGender().toUpperCase().startsWith("F")){
-                women.add(bmi);
-///             Considerado obeso quem tem IMC > 30
-                if (bmi.getBmi() > 30) obesityWomen.add(bmi);
-            } else {
-                men.add(bmi);
-///             Considerado obeso quem tem IMC > 30
-                if (bmi.getBmi() > 30) obesityMen.add(bmi);
+        /// Considerado obeso quem tem IMC > 30
+        for (CandidateDTO candidate : candidates){
+            if (candidate.getGender().toUpperCase().startsWith("F")){
+                women.add(candidate);
+                if (candidate.getBmi() > 30) obesityWomen.add(candidate);
+            }
+
+            if (candidate.getGender().toUpperCase().startsWith("M")) {
+                men.add(candidate);
+                if (candidate.getBmi() > 30) obesityMen.add(candidate);
             }
         }
         double maleObesityRate = 0.0;
@@ -54,7 +71,7 @@ public class ReportService {
             femaleObesityRate  = (double) obesityWomen.size() / women.size();
         }
 
-        return new ObesityRateDTO(maleObesityRate, femaleObesityRate);
+        return List.of(new ObesityRateDTO("women", femaleObesityRate), new ObesityRateDTO("men", maleObesityRate));
     }
 
     public List<AverageAgeByBloodTypeDTO> getAverageAgesByBloodType(){

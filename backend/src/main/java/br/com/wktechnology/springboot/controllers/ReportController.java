@@ -52,8 +52,8 @@ public class ReportController {
     }
 
     @GetMapping(value = "/obesity-rate-by-gender")
-    public ResponseEntity<ObesityRateDTO> getObesityRateByGender(){
-        ObesityRateDTO result = service.getObesityRate();
+    public ResponseEntity<List<ObesityRateDTO>> getObesityRateByGender(){
+        List<ObesityRateDTO> result = service.getObesityRate();
         return ResponseEntity.ok(result);
     }
 
@@ -74,9 +74,8 @@ public class ReportController {
 
 
     @PostMapping(value = "/upload-json", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<JsonUploadResponse> uploadFile(@RequestParam("file") MultipartFile jsonFile) {
+    public ResponseEntity<JsonUploadResponse> uploadFile(@RequestPart("file") MultipartFile jsonFile) {
         try {
-
             byte[] jsonFileBytes = jsonFile.getBytes();
             ObjectMapper mapper = new ObjectMapper();
 

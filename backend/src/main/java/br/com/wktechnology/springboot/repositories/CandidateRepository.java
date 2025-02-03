@@ -18,11 +18,11 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
             "FROM Candidate c")
     List<CandidateDTO> getCandidates();
 
-    @Query("SELECT new br.com.wktechnology.springboot.dtos.CandidatesOfStateDTO(c.state, COUNT(c)) " +
-            "FROM Candidate c " +
-            "WHERE c.valid = true " +
-            "GROUP BY c.state ")
-    List<CandidatesOfStateDTO> countByState();
+//    @Query("SELECT new br.com.wktechnology.springboot.dtos.CandidatesOfStateDTO(c.state, COUNT(c)) " +
+//            "FROM Candidate c " +
+//            "WHERE c.valid = true " +
+//            "GROUP BY c.state ")
+//    List<CandidatesOfStateDTO> countByState();
 
     @Query("SELECT new br.com.wktechnology.springboot.dtos.CandidateBloodTypeAndAgeDTO(c.bloodType, c.age) FROM Candidate c")
     List<CandidateBloodTypeAndAgeDTO> getCandidatesBloodTypeAndAge();

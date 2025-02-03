@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wktechnology/models/average_age_data.dart';
-import 'package:wktechnology/models/average_bmi_data.dart';
-import 'package:wktechnology/models/donors_data.dart';
-import 'package:wktechnology/models/state_data.dart';
 
 import '../../widgets/report_header.dart';
-import 'bmi_report.dart';
-import 'donors_report.dart';
 
 class AverageAgeReportView extends StatelessWidget {
   const AverageAgeReportView({super.key, required this.data});

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wktechnology/models/average_bmi_data.dart';
 import 'package:wktechnology/models/donors_data.dart';
-import 'package:wktechnology/models/state_data.dart';
 
 import '../../widgets/report_header.dart';
 
@@ -16,7 +14,7 @@ class DonorsReportView extends StatelessWidget {
       child: Column(
         children: [
           const ReportHeader(
-            title: 'Doadores',
+            title: 'Possíveis Doadores',
             subtitle: 'Possíveis doadores para cada tipo sanguíneo receptor',
             icon: Icons.bloodtype,
           ),
@@ -66,7 +64,7 @@ class CustomBloodCard extends StatelessWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: .10),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
@@ -108,23 +106,6 @@ class CustomBloodCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-// Example usage:
-class BloodDonorList extends StatelessWidget {
-  const BloodDonorList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: const [
-        CustomBloodCard(bloodType: 'A+', numberOfDonors: 28),
-        CustomBloodCard(bloodType: 'B+', numberOfDonors: 23),
-        CustomBloodCard(bloodType: 'O+', numberOfDonors: 40),
-        // Add more blood types as needed
-      ],
     );
   }
 }
