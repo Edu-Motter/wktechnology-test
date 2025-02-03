@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:wktechnology/models/average_age_data.dart';
+import 'package:wktechnology/models/data/average_age_data.dart';
 
+import '../../widgets/empty_report_message.dart';
 import '../../widgets/report_header.dart';
 
 class AverageAgeReportView extends StatelessWidget {
-  const AverageAgeReportView({super.key, required this.data});
+  const AverageAgeReportView({
+    super.key,
+    required this.data,
+    required this.empty,
+  });
 
   final List<AverageAgeData> data;
+  final bool? empty;
 
   @override
   Widget build(BuildContext context) {
+    if (empty ?? true) return EmptyReportMessage();
+
     return SingleChildScrollView(
       child: Column(
         children: [
           const ReportHeader(
-            title: 'Média de idade por tipo sanguíneo',
-            // subtitle: 'Média de idade para cada tipo sanguíneo',
+            title: 'Média de idade',
+            subtitle: 'Média de idade para cada tipo sanguíneo',
             icon: Icons.people_alt_rounded,
           ),
           ListView.builder(
@@ -92,7 +100,7 @@ class CustomAgeCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    averageAge.toString(),
+                    averageAge.toStringAsFixed(2),
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,

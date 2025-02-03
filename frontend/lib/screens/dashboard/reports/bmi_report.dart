@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:wktechnology/models/average_bmi_data.dart';
+import 'package:wktechnology/models/data/average_bmi_data.dart';
 
+import '../../widgets/empty_report_message.dart';
 import '../../widgets/report_header.dart';
 
 class BMIReportView extends StatelessWidget {
-  const BMIReportView({super.key, required this.data});
+  const BMIReportView({
+    super.key,
+    required this.data,
+    required this.empty,
+  });
 
   final List<BMIData> data;
+  final bool? empty;
 
   @override
   Widget build(BuildContext context) {
+    if (empty ?? true) return EmptyReportMessage();
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -86,14 +94,14 @@ class CustomBMICard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        ' até  ',
+                        ' até ',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[600],
                         ),
                       ),
                       Text(
-                        ageRange.split(' - ')[1].replaceAll(':', ''),
+                        ageRange.split(' - ')[1],
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -136,7 +144,7 @@ class CustomBMICard extends StatelessWidget {
                     textBaseline: TextBaseline.alphabetic,
                     children: [
                       Text(
-                        averageBMI.toString(),
+                        averageBMI.toStringAsFixed(2),
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,

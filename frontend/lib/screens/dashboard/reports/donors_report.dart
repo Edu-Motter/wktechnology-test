@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:wktechnology/models/donors_data.dart';
 
+import '../../../models/data/donors_data.dart';
+import '../../widgets/empty_report_message.dart';
 import '../../widgets/report_header.dart';
 
 class DonorsReportView extends StatelessWidget {
-  const DonorsReportView({super.key, required this.data});
+  const DonorsReportView({
+    super.key,
+    required this.data,
+    required this.empty,
+  });
 
   final List<DonorsData> data;
+  final bool? empty;
 
   @override
   Widget build(BuildContext context) {
+    if (empty ?? true) return EmptyReportMessage();
+
     return SingleChildScrollView(
       child: Column(
         children: [

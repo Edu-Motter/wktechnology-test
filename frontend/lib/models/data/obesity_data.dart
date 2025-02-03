@@ -13,11 +13,4 @@ class ObesityData {
       obesityRate: json['obesityRate'] as double,
     );
   }
-
-  factory ObesityData.empty() {
-    return ObesityData(
-      gender: '',
-      obesityRate: 0,
-    );
-  }
 }

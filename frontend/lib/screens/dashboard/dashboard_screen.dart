@@ -3,8 +3,8 @@ import 'package:result_dart/result_dart.dart';
 import 'package:wktechnology/screens/dashboard/reports/average_age_report.dart';
 import 'package:wktechnology/screens/dashboard/reports/bmi_report.dart';
 
-import '../../models/report.dart';
-import '../../repository/reports_repository.dart';
+import '../../models/reports/report.dart';
+import '../../repository/reports_repository_impl.dart';
 import '../widgets/report_chip.dart';
 import '../widgets/ui.dart';
 import 'dashboard_viewmodel.dart';
@@ -28,9 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     model.addListener(() => setState(() {}));
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        model.updateSelectedReport(DonorsReport());
-      });
+      setState(() => model.executeRefresh());
     });
     super.initState();
   }
@@ -41,12 +39,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       (success) => UIHelper.showSuccess(context, message: success),
       (error) => UIHelper.showError(
         context,
-        message: 'ERROR: $error',
+        message: 'Fail: $error',
       ),
     );
   }
 
-  void updateReportSelection({required Report report}) {
+  void updateReportSelected({required Report report}) {
     model.updateSelectedReport(report);
   }
 
@@ -54,7 +52,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    const double widthPadding = 16;
+    const double defaultPadding = 16;
 
     final title = Row(
       children: [
@@ -82,31 +80,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
           height: 4,
           color: theme.primaryColor.withValues(alpha: .5),
           thickness: 0.5,
-          endIndent: 16,
-          indent: 16,
+          endIndent: defaultPadding,
+          indent: defaultPadding,
         ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              SizedBox(width: widthPadding),
+              SizedBox(width: defaultPadding),
               for (int i = 0; i < model.reports.length; i++)
                 Padding(
                   padding: EdgeInsets.only(left: i == 0 ? 0 : 8),
                   child: ReportChip(
-                    icon: model.reports[i].getType().icon,
-                    text: model.reports[i].getType().label,
-                    isSelected: model.isThisReportSelected(model.reports[i]),
-                    onSelect: () => updateReportSelection(
-                      report: model.reports[i],
-                    ),
+                    icon: model.reports[i].icon,
+                    text: model.reports[i].name,
+                    isSelected: model.isThisReportSelected(i),
+                    onSelect: () {
+                      model.updateSelectedReport(model.reports[i]);
+                    },
                   ),
                 ),
-              SizedBox(width: widthPadding),
+              SizedBox(width: defaultPadding),
             ],
           ),
         ),
-        SizedBox(height: 16)
+        SizedBox(height: defaultPadding),
       ],
     );
 
@@ -183,27 +181,11 @@ class ReportRender extends StatelessWidget {
       );
     }
 
-    if (report is DonorsReport) {
-      return DonorsReportView(data: report?.getData());
+    if (report != null) {
+      return report!.view;
+    } else {
+      return Container(color: Colors.grey);
     }
-
-    if (report is BMIReport) {
-      return BMIReportView(data: report?.getData());
-    }
-
-    if (report is ObesityReport) {
-      return ObesityReportView(data: report?.getData());
-    }
-
-    if (report is StatesReport) {
-      return StateReportView(data: report?.getData());
-    }
-
-    if (report is AverageAgeReport) {
-      return AverageAgeReportView(data: report?.getData());
-    }
-
-    return Container(color: Colors.grey);
   }
 }
 
