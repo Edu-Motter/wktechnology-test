@@ -20,7 +20,7 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
     @Query("SELECT new br.com.wktechnology.springboot.dtos.CandidateBloodTypeAndAgeDTO(c.bloodType, c.age) FROM Candidate c")
     List<CandidateBloodTypeAndAgeDTO> getCandidatesBloodTypeAndAge();
 
-    @Query("SELECT new br.com.wktechnology.springboot.dtos.NumberOfDonorsByBloodTypeResponse(c.bloodType, COUNT(c)) " +
+    @Query("SELECT new br.com.wktechnology.springboot.dtos.NumberOfDonorsByBloodTypeDTO(c.bloodType, COUNT(c)) " +
             "FROM Candidate c " +
             "WHERE c.valid = true " +
             "GROUP BY c.bloodType ")
