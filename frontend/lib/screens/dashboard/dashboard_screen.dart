@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:result_dart/result_dart.dart';
-import 'package:wktechnology/screens/dashboard/reports/average_age_report.dart';
-import 'package:wktechnology/screens/dashboard/reports/bmi_report.dart';
 
 import '../../models/reports/report.dart';
 import '../../repository/reports_repository_impl.dart';
 import '../widgets/report_chip.dart';
 import '../widgets/ui.dart';
 import 'dashboard_viewmodel.dart';
-import 'reports/donors_report.dart';
-import 'reports/obesity_report.dart';
-import 'reports/state_report.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
