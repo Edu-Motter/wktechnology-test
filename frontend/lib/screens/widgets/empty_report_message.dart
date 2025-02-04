@@ -24,7 +24,7 @@ class EmptyReportMessage extends StatelessWidget {
             width: 96,
             height: 96,
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: Theme.of(context).primaryColor.withValues(alpha: .10),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
