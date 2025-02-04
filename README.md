@@ -35,8 +35,13 @@ java --version | grep "openjdk"
 ### Backend
 1. Acesse a pasta do backend e execute o docker compose:
    ```bash
-   cd backend && docker compose up
+   cd backend 
+   ./mvnw clean install -DskipTests
+   docker compose up
    ```
+
+   Ao final do startup, deve ter o seguinte log dentro do compose: 
+   >`wk-backend   | Spring Boot Application running in http://localhost:8082`
 
 ### Frontend
 
@@ -82,7 +87,13 @@ Caso vá rodar o app Flutter em um dispositivo físico, será necessário altera
 
 ## Testes com Postman
 
-Na pasta `/docs` há um export com os endpoints já configurados, caso deseje utilizar o Postman para testes dos endpoints.
+Na pasta `/docs`, há um export com os endpoints já configurados, caso deseje utilizar o Postman para testar os endpoints.
+
+Ao importar:
+
+1. Adicione `{{baseUrl}}` como variável da coleção com o seguinte valor: `http://localhost:8082/api`.
+2. Caso deseje enviar um JSON pelo Postman, selecione o `Body` como `Form-data` e anexe o arquivo `.json` no campo `Value`.
+
 
 ## Banco de Dados - MySQL
 
@@ -102,6 +113,21 @@ Caso tenha problemas de conexão do DB com o DBeaver, verifique essas configura�
 ```
 
 Mais informações: [StackOverflow - Connection between DBeaver & MySQL](https://stackoverflow.com/questions/61749304/connection-between-dbeaver-mysql)
+
+
+### Testes Unitários  
+
+Foram adicionados alguns testes unitários para exemplificar seus usos:
+
+- **Dart/Flutter:**  
+  - `donors_data_test.dart`: Testa a criação da classe `DonorsData` e sua conversão a partir de JSON.  
+  - `states_report_test.dart`: Garante o correto funcionamento do `StatesReport`, simulando cenários com `mocktail` para testar a lógica do builder e do reporta data.  
+
+- **Java/Spring Boot:**  
+  - Testes para os serviços que calculam IMC (`calculateBMI`), idade (`calculateAge`) e validação de candidatos (`isValidCandidate`), garantindo que as regras de negócio sejam aplicadas corretamente.  
+  - Teste para o método `getAverageAgeByBloodType()`, verificando a correta agregação e cálculo da idade média por tipo sanguíneo, sem dependência de banco de dados.  
+
+Esses testes asseguram a integridade das funcionalidades e a confiabilidade da aplicação.
 
 ---
 
