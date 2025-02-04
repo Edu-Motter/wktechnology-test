@@ -127,7 +127,9 @@ Foram adicionados alguns testes unitários para exemplificar seus usos:
   - Testes para os serviços que calculam IMC (`calculateBMI`), idade (`calculateAge`) e validação de candidatos (`isValidCandidate`), garantindo que as regras de negócio sejam aplicadas corretamente.  
   - Teste para o método `getAverageAgeByBloodType()`, verificando a correta agregação e cálculo da idade média por tipo sanguíneo, sem dependência de banco de dados.  
 
-Esses testes asseguram a integridade das funcionalidades e a confiabilidade da aplicação.
+### Git
+
+Na branch `main`, foram realizados alguns *git squashes* para organizar melhor os commits. Já na branch `development`, é possível acompanhar o processo de criação do projeto de forma mais detalhada.
 
 ---
 
