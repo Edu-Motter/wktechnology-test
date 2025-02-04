@@ -63,7 +63,7 @@ public class CandidateService {
         return candidates;
     }
 
-    private boolean isValidCandidate(Candidate candidate){
+    boolean isValidCandidate(Candidate candidate){
         /// Somente com peso acima de 50 Kg podem doar sangue
         if (candidate.getWeightInKg() < 50) return false;
         /// Somente pessoas com idade de 16 a 69 anos podem doar sangue
@@ -88,7 +88,7 @@ public class CandidateService {
         return age;
     }
 
-    private Double calculateBMI(Candidate candidate) {
+    Double calculateBMI(Candidate candidate) {
         double heightInMeters = candidate.getHeightInMeters();
         if (heightInMeters <= 0) return 0.0;
         return (candidate.getWeightInKg() / (heightInMeters * heightInMeters));
