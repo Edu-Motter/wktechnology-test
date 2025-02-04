@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wktechnology/models/data/average_age_data.dart';
-import 'package:wktechnology/models/data/average_bmi_data.dart';
-import 'package:wktechnology/models/data/donors_data.dart';
-import 'package:wktechnology/models/data/obesity_data.dart';
-import 'package:wktechnology/models/data/state_data.dart';
 
 typedef FutureVoidCallback = Future<void> Function();
 
